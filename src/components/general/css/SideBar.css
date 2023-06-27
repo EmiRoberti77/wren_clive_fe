@@ -1,0 +1,17 @@
+@import '~bootstrap-icons/font/bootstrap-icons';
+
+.sub-menu {
+  margin-left: 0rem;
+}
+
+.nav-item:hover {
+  background-color: rgb(32,
+      33,
+      112);
+  /* or any other background color or style */
+  cursor: pointer;
+}
+
+.no-bullet {
+  list-style: none;
+}

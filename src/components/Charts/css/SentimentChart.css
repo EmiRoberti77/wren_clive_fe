@@ -1,0 +1,18 @@
+.SAchart-container {
+    width: 100%;
+
+}
+
+.apexcharts-xaxis-tick {
+    color: white;
+    stroke: aliceblue;
+}
+
+.apexcharts-xaxis .apexcharts-yaxis-inversed {
+    color: white;
+    stroke: aliceblue;
+}
+
+.apexcharts-inner .apexcharts-graphical {
+    color: white;
+}

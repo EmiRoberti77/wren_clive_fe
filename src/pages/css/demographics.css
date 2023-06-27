@@ -1,0 +1,287 @@
+.main-container {
+  height: 100%;
+  margin-right: 20px;
+
+
+}
+
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.loading-screen span {
+  color: #fff;
+  font-size: 24px;
+  font-weight: bold;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.4;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.4;
+  }
+}
+
+.refresh-button Button {
+  float: right;
+  margin-left: 20px;
+  background-color: #1f40c6;
+  color: white;
+  padding: 10px 12px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 15px;
+  border-radius: 5px;
+  border: none;
+
+}
+
+.top-container {
+  display: flex;
+  height: 60px;
+  align-items: center;
+  background: #091640 no-repeat;
+  margin-top: 25px;
+  margin-left: 25px;
+  border-radius: 10px;
+}
+
+.top-content {
+  align-items: center;
+  display: flex;
+  width: 100%;
+  padding-left: 25px;
+  padding-right: 25px;
+}
+
+.title-demographic {
+  font-size: 18px;
+}
+
+.DropDownContainer {
+  display: flex;
+  place-content: center;
+  align-items: center;
+  background: #091640 no-repeat;
+  margin-top: 25px;
+  margin-left: 25px;
+  border-radius: 10px;
+  padding: 10px;
+
+}
+
+.dropdown-label {
+  margin-left: 20px !important;
+  font-size: 12px;
+}
+
+
+#demo-select-small-label {
+  left: 20px !important;
+}
+
+.datePickerLabel {
+  font-size: 12px;
+}
+
+.To-date-picker {
+  padding: 10px;
+  font-size: 12px;
+  height: 40px;
+}
+
+.From-date-picker {
+  padding: 10px;
+  font-size: 12px;
+  height: 40px;
+}
+
+.css-o9k5xi-MuiInputBase-root-MuiOutlinedInput-root {
+  height: 40px;
+  color: white;
+}
+
+.css-1869usk-MuiFormControl-root {
+  margin: 0px !important;
+}
+
+.css-1u3bzj6-MuiFormControl-root-MuiTextField-root {
+  background-color: #4270ed;
+  border-radius: 5px;
+  color: white;
+  /* height: 40px; */
+}
+
+.css-1yk1gt9-MuiInputBase-root-MuiOutlinedInput-root-MuiSelect-root {
+  margin-left: 20px;
+}
+
+.css-9ddj71-MuiInputBase-root-MuiOutlinedInput-root {
+  /* height: 40px; */
+
+}
+
+.css-1t8l2tu-MuiInputBase-input-MuiOutlinedInput-input {
+  height: 20px !important;
+  color: white;
+}
+
+
+
+.DropDownContainer .FromDate {
+  margin-right: 20px;
+  margin-bottom: 0px;
+
+}
+
+.DropDownContainer .ToDate {
+  margin-right: 10px;
+}
+
+
+
+
+
+.css-11u53oe-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input {
+  background-color: #4270ed !important;
+  height: 20px !important;
+  width: 143px !important;
+  min-height: 10px !important;
+  border-radius: 5px !important;
+  color: white !important;
+  padding: 10px 10px !important;
+
+}
+
+.Chart_main {
+  text-align: center;
+}
+
+.Chart_Container {
+  display: flex;
+  flex-direction: row;
+  text-align: left;
+  /* margin: 25px; */
+  margin-top: 25px;
+  margin-left: 25px;
+
+  /* background-color: #091b56; */
+  background-image: linear-gradient(126.97deg, rgba(6, 11, 40, 0.74) 28.26%, rgba(10, 14, 35, 0.71) 91.2%);
+  padding: 10px;
+  border-radius: 10px;
+
+
+
+}
+
+.AGChart_main {}
+
+.Chart_Container2 {
+  display: flex;
+  flex-direction: row;
+  text-align: left;
+  margin-top: 25px;
+  margin-left: 25px;
+  /* background-color: #091b56; */
+  background-image: linear-gradient(126.97deg, rgba(6, 11, 40, 0.74) 28.26%, rgba(10, 14, 35, 0.71) 91.2%);
+  padding: 10px;
+  border-radius: 10px;
+
+}
+
+.chart_1 {
+  background-image: linear-gradient(127.09deg, rgba(6, 11, 40, 0.94) 19.41%, rgba(10, 14, 35, 0.49) 76.65%);
+  width: 40%;
+  padding: 15px;
+  border-radius: 15px;
+  color: black;
+}
+
+
+.chart_2 {
+  background-image: linear-gradient(127.09deg, rgba(6, 11, 40, 0.94) 19.41%, rgba(10, 14, 35, 0.49) 76.65%);
+  width: 30%;
+  margin-left: 10px;
+  padding: 15px;
+  border-radius: 15px;
+  color: black;
+
+}
+
+.AgePieChart {}
+
+.chart_3 {
+  background-image: linear-gradient(127.09deg, rgba(6, 11, 40, 0.94) 19.41%, rgba(10, 14, 35, 0.49) 76.65%);
+  width: 30%;
+  margin-left: 10px;
+  padding: 15px;
+  border-radius: 15px;
+  color: black;
+
+}
+
+
+
+.chart_3npm {
+  background-image: linear-gradient(127.09deg, rgba(6, 11, 40, 0.94) 19.41%, rgba(10, 14, 35, 0.49) 76.65%);
+  width: 100%;
+  margin-left: 10px;
+  padding: 15px;
+  border-radius: 15px;
+  color: black;
+
+}
+
+.charttitle {
+  font-size: 12px;
+  margin-left: 10px;
+  color: white;
+}
+
+.css-1ps6pg7-MuiPaper-root {
+  background-color: none !important;
+}
+
+.apexcharts-legend-text {
+  padding-left: 15px;
+  margin-left: -15px;
+  color: white !important;
+}
+
+
+
+.apexcharts-toolbar svg {
+  fill: white !important;
+}
+
+.apexcharts-tooltip.apexcharts-theme-light {
+  color: rgb(45, 45, 45) !important;
+}
+
+.apexcharts-menu {
+
+  color: rgb(45, 45, 45) !important;
+
+}
+
+.chartCss {
+  margin-top: 20px;
+
+}

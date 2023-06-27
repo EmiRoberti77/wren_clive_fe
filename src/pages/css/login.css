@@ -1,0 +1,76 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+#main-container {
+  place-items: center center;
+  /* background-image: url(/src/assets/background.png); */
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: 100;
+
+
+}
+
+#sign-form {
+
+  /* background-color: black; */
+  margin-top: 10%;
+  background: linear-gradient(126.97deg, rgba(6, 11, 40, 0.74) 28.26%, rgba(10, 14, 35, 0.71) 91.2%);
+  max-width: 300px;
+  max-height: 500px;
+  padding: 25px;
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  row-gap: 15px;
+
+}
+
+.input-text {
+  display: flex;
+  flex-direction: column;
+  row-gap: 8px;
+}
+
+/* Inner Elements */
+
+.d-flex {
+  display: flex !important;
+  column-gap: 10px !important;
+}
+
+.form-control:focus {
+  z-index: 5;
+}
+
+/* .form-control-lg {} */
+
+body {
+  display: grid;
+  background: white;
+  min-height: 100vh;
+}
+
+.form-control-lg {
+  min-height: 2rem;
+  min-width: 100%;
+  font-size: 1rem;
+}
+
+.d-grid {
+  min-height: 1rem !important;
+  font-size: 1rem !important;
+}
+
+.btn-group-lg>.btn,
+.btn-lg {
+  --bs-btn-padding-y: 0.5rem;
+  --bs-btn-padding-x: 1rem;
+  --bs-btn-font-size: 1rem !important;
+  --bs-btn-border-radius: 0.5rem;
+}
+
+.login-status {
+  font-size: 1rem;
+
+}

@@ -1,0 +1,124 @@
+.home-main-container {
+    height: 100%;
+    margin-right: 20px;
+
+
+}
+
+.home-top-container {
+    display: flex;
+    height: 60px;
+    align-items: center;
+    background: #091640 no-repeat;
+    margin-top: 25px;
+    margin-left: 25px;
+    border-radius: 10px;
+}
+
+.home-top-content {
+    align-items: center;
+    display: flex;
+    width: 100%;
+    padding-left: 25px;
+    padding-right: 25px;
+}
+
+.title-home {
+    font-size: 18px;
+}
+
+.home-DropDownContainer {
+    display: flex;
+    column-gap: 2%;
+    place-content: left;
+    /* background: #091640 no-repeat; */
+    margin-top: 10px;
+    margin-left: 25px;
+    border-radius: 10px;
+    padding: 10px;
+
+}
+
+.DDtext {
+    font-size: 12px;
+}
+
+.AgeDD {
+    background: #091640 no-repeat;
+    padding-top: 5px;
+    padding-bottom: 15px;
+    padding-left: 10px;
+    padding-right: 25px;
+    border-radius: 10px;
+}
+
+.home-DropDownContainer .css-11u53oe-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input {
+    background-color: #4270ed !important;
+    width: 210px !important;
+    height: 15px !important;
+    min-height: 10px !important;
+    border-radius: 5px !important;
+    color: white !important;
+    padding: 10px 10px !important;
+
+}
+
+.analytics-gauge-container {
+    display: flex;
+    column-gap: 3%;
+    place-content: left;
+    margin-top: 10px;
+    margin-left: 25px;
+    border-radius: 10px;
+    padding: 10px;
+
+}
+
+.Gauge-card {
+    display: flex;
+    flex-direction: column;
+    row-gap: 20px;
+    background-color: #091640ce;
+    place-items: center;
+    padding: 25px;
+    border-radius: 20px;
+    min-width: 200px;
+
+}
+
+.footfall-container {
+    display: flex;
+    column-gap: 2%;
+    place-content: left;
+    /* background: #091640 no-repeat; */
+
+    margin-left: 25px;
+    border-radius: 10px;
+    padding: 10px;
+
+}
+
+.footfall-chart {
+    color: white !important;
+    column-gap: 2%;
+    place-content: left;
+    background: #091640ce;
+    /* background-image: linear-gradient(126.97deg, rgba(6, 11, 40, 0.74) 28.26%, rgba(10, 14, 35, 0.71) 91.2%); */
+    margin-top: 10px;
+    border-radius: 10px;
+    padding: 20px;
+    width: 50%;
+
+}
+
+.footfall-bargraph {
+    color: white !important;
+    column-gap: 2%;
+    place-content: left;
+    background: #091640ce;
+    /* background-image: linear-gradient(126.97deg, rgba(6, 11, 40, 0.74) 28.26%, rgba(10, 14, 35, 0.71) 91.2%); */
+    margin-top: 10px;
+    border-radius: 10px;
+    padding: 20px;
+    width: 50%;
+}

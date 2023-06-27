@@ -1,0 +1,331 @@
+from flask import Flask, Response, url_for, render_template, request, redirect,jsonify, send_file
+from datetime import datetime, timedelta
+import numpy as np
+import pandas as pd
+from shapely.geometry import Point
+from shapely.geometry.polygon import Polygon
+import json
+from sqlalchemy import create_engine, text
+from flask_cors import CORS, cross_origin
+import numpy as np
+from PIL import Image
+from io import BytesIO
+import base64
+
+pd.options.display.float_format = '{:.3f}'.format
+
+app = Flask(__name__)
+CORS(app)
+
+images=[r"images\image1.jpg", r"images\image2.jpg", r"images\image3.jpg"]
+
+def shop_enterance_filter(df,line_position=0.9):
+    d={}
+    for i in range(len(df)):
+        z=df.loc[i]
+        if(z['tracking_id'] in d):
+            d[z['tracking_id']]=max([d[z['tracking_id']],json.loads(z['metadata'])['lower_Body_xyxyn'][3]])
+        else:
+            d[z['tracking_id']]=json.loads(z['metadata'])['lower_Body_xyxyn'][3]
+    ids=[i for i in d if(d[i]>line_position)]
+    df_f=df.loc[df['tracking_id'].isin(ids)]
+    return df_f
+
+
+def demographics(dfs, color_filter=None):
+    gender_cat=['Male','Female','unknown']
+    age_cat=['0-2', '3-9', '10-19', '20-29', '30-39', '40-49', '50-59', '60-69','70+']
+    #print(len(dfs))
+    demo={}
+    for i in age_cat:
+        demo[i]={}
+        for j in gender_cat:
+            demo[i][j]=0
+    for df in dfs:
+        z=shop_enterance_filter(df=df).to_dict()
+        streams=list(set(z["stream"].values()))
+        people_dict={}
+        for i in z["metadata"]:
+            data,idn,stream = [z["metadata"][i],str(z["tracking_id"][i]),z["stream"][i]]
+            idx=str(streams.index(stream))
+            data=json.loads(data)
+            if(data["upper_Body_Color"]==color_filter):
+                continue
+            data={"age":data["age"], "age_conf":data["age_conf"], "gender":data["gender"], "gender_conf":data["gender_conf"]}
+            if((idx+idn)in people_dict):
+
+                if(data["age_conf"]>people_dict[idx+idn]["age_conf"]):
+                    people_dict[idx+idn]['age']=data["age"]
+                    people_dict[idx+idn]['age_conf']=data["age_conf"]
+                if(data["gender_conf"]>people_dict[idx+idn]["gender_conf"]):
+                    people_dict[idx+idn]['gender']=data["gender"]
+                    people_dict[idx+idn]['gender_conf']=data["gender_conf"]
+                
+            else:
+                people_dict[idx+idn]=data
+        
+        for i in people_dict:
+            demo[people_dict[i]['age']][people_dict[i]['gender']]+=1
+        
+    demo["0-9"]={}
+    for gen in gender_cat:
+        demo["0-9"][gen]=demo["0-2"][gen]+demo["3-9"][gen]
+    demo.pop("0-2")
+    demo.pop("3-9")
+
+    return demo
+
+def data_tables(start_date_str,end_date_str):
+    # Convert the input strings to datetime objects
+    start_date = datetime.strptime(start_date_str, "%d-%m-%Y")
+    end_date = datetime.strptime(end_date_str, "%d-%m-%Y")
+    
+    # Define a timedelta object with a one-day interval
+    one_day = timedelta(days=1)
+
+    #table list
+    table_list=[]
+    
+    # Print the dates between the start and end dates
+    current_date = start_date
+    while current_date <= end_date:
+        table_name="metatable"+current_date.strftime("%d%m%Y")
+        #print(table_name+",")
+        table_list.append(table_name)
+        current_date += one_day
+    return table_list
+
+def get_ids(df,polys):
+    idz=[]
+    dfs=[]
+    idx=[]
+    for polyps in polys:
+        #polyps=[[x,y] for x,y in zip(polyp[::2],polyp[1:][::2])]
+        df['point'] = df.apply(lambda row: Point(row['X'],row['Y']),axis=1)
+        polygon = Polygon(polyps)
+        df_1 = df[df['point'].apply(polygon.contains)].copy()
+        idz += list(set(df_1['Object id'].to_list()))
+        idx.append(list(set(df_1['Object id'].to_list())))
+        df_1=df_1.drop(['point'], axis=1)
+        dfs.append(df_1)
+    #idz=set(idz)
+    idz=idx[0]
+    for lizt in idx[1:]:
+        liz=[]
+        for z in idz:
+            if(z in lizt):
+                liz.append(z)
+        idz=liz
+    return [set(idz),idx,dfs]
+
+def dwell_time(df,id):
+    liz=df.loc[df['Object id']==id]['time'].to_list()
+    return [min(liz),max(liz)]
+
+def gen_peeloff(data):
+    
+    d={"Entered":{"A":0,"B":0},"Exited":{"A":0,"B":0},"Passerby":{"AB":0,"BA":0}}
+    for i in data:
+        path=data[i]
+        if('2' in path):
+            if('1' in path):
+                path=path[0]+path[-1]
+                if(path=='12'):
+                    d["Entered"]['B']+=1
+                else:
+                    d["Exited"]['B']+=1
+
+            else:
+                path=path[0]+path[-1]
+                if(path=='02'):
+                    d["Entered"]['A']+=1
+                else:
+                    d["Exited"]['A']+=1
+        else:
+            path=path[0]+path[-1]
+            if(path=='01'):
+                d["Passerby"]['AB']+=1
+            else:
+                d["Passerby"]['BA']+=1
+    d["Entered"]["total"]=d["Entered"]['A']+d["Entered"]['B']
+    d["Exited"]["total"]=d["Exited"]['A']+d["Exited"]['B']
+    d["Passerby"]["total"]=d["Passerby"]['AB']+d["Passerby"]['BA']
+    d["Conversion"]=str(round((d["Entered"]["total"]/d["Passerby"]["total"])*100))+"%"
+    return d
+
+def dwell_areas(dwell_times):
+    allkeys=[j for i in dwell_times for j in i.keys()]
+    d={i:{} for i in allkeys}
+    for id,keys in enumerate(dwell_times):
+        for i in allkeys:
+            if i in keys:
+                d[i][id]=keys[i]
+    return d
+
+def dwell_path(dwell_time_area):
+    d={i:"" for i in dwell_time_area}
+    for id in dwell_time_area:
+        dd=dwell_time_area[id]
+        tf=[j for i in dd.values() for j in i]
+        tf.sort()
+        tfid={j:i for i in dd for j in dd[i]}
+        d[id]="".join([str(tfid[i]) for i in tf])
+    return d
+
+def polygonfilter(df,polyp):
+    #print(polyp)
+    #df2= pd.DataFrame()
+    #df2['x']=df['X']
+    #df2['y']=df['Y']
+    #df2['id']=df['Object id']
+    #df2['time']=df['time']
+    #df=df2.copy()
+    data=df.copy()
+    dfs=[]
+    idx=[]
+    if(len(polyp[0])>0):
+        #print(len(polyp[0]))
+        #polyp=[[x,y] for x,y in zip(polyp[::2],polyp[1:][::2])]
+        #df['point'] = df.apply(lambda row: Point(row['x'],row['y']),axis=1)
+        #polygon = Polygon(polyp)
+        #df_1 = df[df['point'].apply(polygon.contains)].copy()
+        ids,idx,dfs = get_ids(df,polyp) #set(df_1['id'].to_list())
+        df_f=df.loc[df['Object id'].isin(ids)]
+        data=df_f.copy()
+    return [data,idx,dfs]
+
+def get_json(data,value):
+    df2= pd.DataFrame()
+    df2['x']=data['X']
+    df2['y']=data['Y']
+    data=df2.to_numpy().tolist()
+    #l=["{ \"x\": "+str(i[0])+", \"y\": "+str(i[1])+", \"value\": "+str(value)+" }" for i in data]
+    out=[{ "x": i[0], "y": i[1], "value": value } for i in data]#"[ "+",".join(l)+" ]"
+    return out
+
+def image_bytes_gen(data):
+    img = Image.fromarray(data.astype('uint8'))
+
+    # Convert the image to a base64 string
+    buffer = BytesIO()
+    img.save(buffer, format='PNG')
+    img_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+    return Response(img_base64, mimetype='image/png') 
+
+
+def get_random_data():
+    data= np.random.randint(low=0,high=[720,480,20],size=[400,3])
+    df=pd.DataFrame(data, columns = ['X','Y','Object id'])
+    return df
+
+def get_db(dbname='pos',tablename='Heatmapstore', user="postgres", password='dummy', host='localhost', port=5432, date='', stime='', etime='', color=False):
+    engine = create_engine('postgresql://{}:{}@{}:{}/{}'.format(user,password,host,port,dbname))
+    with engine.connect() as conn:
+        query='SELECT * FROM public.\"{}\"'.format(tablename)
+        if((len(date)>0)and(len(stime)>0)and(len(etime)>0)):
+            query+=' WHERE date=\'{}\' AND time >= {} AND time <= {}'.format(date,stime,etime)
+        elif(type(date)==list):
+            query+=' WHERE date>=\'{}\' AND date<=\'{}\' and color={}'.format(date[0],date[1],color)
+        df=pd.read_sql_query(text(query),conn)
+        #print(query)
+    return df
+
+def return_site_json(df):
+    d={i:[] for i in set(df["site"].to_list())}
+    dfs=[df.loc[df['site'].isin([i])] for i in d]
+    for i,j in zip(d,dfs):
+        for a,b,c in zip(j["camera"].to_list(),j["tablename"].to_list(),j["refImage"].to_list()):
+            d[i].append({"camera":a,"tablename":b,"refImage":c})
+    return d
+
+
+def get_data():
+    df2=pd.read_csv("testdata.csv")
+    df= pd.DataFrame()
+    df['x']=df2['X']
+    df['y']=df2['Y']
+    df['id']=df2['Object id']
+    return df
+
+
+@app.route('/api/heatmaps', methods=["POST","GET"])
+@cross_origin(origins='*')
+def data_retiver():
+    if request.method == 'POST':
+        data = request.form['polygon']
+        data = json.loads(data)
+        date = request.form['date']
+        stime = request.form['stime']
+        etime = request.form['etime']
+        image = request.files.get('imagefile', '')
+    else:
+        data = request.args.get('polygon')
+        data = json.loads(data)[0]
+        sdate = request.args.get('sdate')
+        edate = request.args.get('edate')
+        stime = request.args.get('stime')
+        etime = request.args.get('etime')
+        #image=None
+        strength = request.args.get('strength')
+        tablename = request.args.get('tablename')
+    #out=heatmap_gen(image,polygonfilter(get_db(dbname='POS', user="postgres", password='dummy', host='localhost', port=5432, date=date, stime=stime, etime=etime), data))
+    #out = [ date, stime, etime, request.method]
+    #print(data,len(data))
+    df= get_db(dbname='pos', user="postgres", password='admin', host='localhost', port=5432, date=sdate, stime=stime, etime=etime,tablename=tablename)
+    #print(df)
+    [df2,idz,dfz]=polygonfilter(df, data)
+    hmap=get_json(df2,strength)
+    peeloff={}
+    if(len(dfz)==3):
+        #print(idz)
+        dts= [{i:dwell_time(dfz,i) for i in idx} for idx,dfz in zip(idz,dfz)]
+        dta=dwell_areas(dts)
+        path=dwell_path(dta)
+        peeloff=gen_peeloff(path)
+    out= {"heatmap_data":hmap,"peeloff_data":peeloff}
+    return jsonify(out)
+
+
+@app.route('/api/header')
+@cross_origin(origins='*')
+def frame_retiver():
+    df=get_db(dbname='pos', user="postgres", password='admin', host='localhost', port=5432,tablename="Heatmapsites")
+    return jsonify(return_site_json(df))
+
+@app.route('/api/demographics2', methods=["GET"])
+@cross_origin(origins='*')
+def data_retiver_demo2():
+    sdate = request.args.get('sdate')
+    edate = request.args.get('edate')
+    color = request.args.get('color')
+    dfs=[]
+    #print(data_tables(sdate, edate))
+    for table_name in data_tables(sdate, edate):
+        #print(table_name)
+        dfs.append(get_db(dbname='pos', user="postgres", password='admin', host='localhost', port=5432,tablename=table_name,color=color))
+    
+    return jsonify(demographics(dfs,color))
+
+def demographics_sorter(df):
+    dfd=df.to_dict()
+    dfd2={}
+    for i in ['10-19', '20-29', '30-39', '40-49', '50-59', '60-69', '70+', '0-9']:
+        gen={"Male":0,"Female":0,"unknown":0}
+        for j in dfd[i]:
+            liz=[int(k) for k in dfd[i][j].split(",")]
+            for x,y in zip(gen,liz):
+                gen[x]=y
+        dfd2[i]=gen
+    return dfd2
+
+@app.route('/api/demographics', methods=["GET"])
+@cross_origin(origins='*')
+def data_retiver_demo():
+    sdate = request.args.get('sdate')
+    edate = request.args.get('edate')
+    color = request.args.get('color')
+    
+    return jsonify(demographics_sorter(get_db(dbname='pos', user="postgres", password='admin', host='localhost', port=5432, tablename="demographics",date=[datetime.strptime(sdate, "%d-%m-%Y").strftime("%Y-%m-%d"),datetime.strptime(edate, "%d-%m-%Y").strftime("%Y-%m-%d")],color=(color!="None"))),)
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0",debug=True)

@@ -1,0 +1,44 @@
+create table
+
+-- Table: public.CLIVE_tbl_zone_lines
+
+-- DROP TABLE IF EXISTS public."CLIVE_tbl_zone_lines";
+
+CREATE TABLE IF NOT EXISTS public."CLIVE_tbl_zone_lines"
+(
+    sys_int_zone_line_id bigint,
+    sys_int_geo_loc_id_zone bigint,
+    sys_int_geo_loc_id_line bigint,
+    sys_line_in_direction text COLLATE pg_catalog."default",
+    sys_active_from date,
+    sys_active_to date
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public."CLIVE_tbl_zone_lines"
+    OWNER to postgres;
+
+
+
+-- Table: public.CLIVE_tbl_geo_locations
+
+-- DROP TABLE IF EXISTS public."CLIVE_tbl_geo_locations";
+
+CREATE TABLE IF NOT EXISTS public."CLIVE_tbl_geo_locations"
+(
+    sys_int_geo_loc_id bigint,
+    sys_int_geo_type_id bigint,
+    sys_int_parent_loc_id bigint,
+    clnt_str_geo_loc_name text COLLATE pg_catalog."default",
+    clnt_str_geo_loc_code text COLLATE pg_catalog."default",
+    sys_active_from date,
+    sys_active_to date,
+    cust_fld_001 text COLLATE pg_catalog."default",
+    cust_fld_002 text COLLATE pg_catalog."default"
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public."CLIVE_tbl_geo_locations"
+    OWNER to postgres;
