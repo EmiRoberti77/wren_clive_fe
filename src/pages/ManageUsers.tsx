@@ -6,6 +6,8 @@ import axios from 'axios';
 import { UsersApi } from '../data/UsersAPIs';
 import { DataServer } from '../data/DataserverSettings';
 import { DBUser } from '../utils/ValidateLogin';
+import { UserComponent } from '../components/users/UserComponent';
+import UserProfile from '../components/users/UserProfile';
 
 const ADMIN: number = 1;
 const USERS_LOADED = 'loaded all users';
@@ -33,15 +35,43 @@ const ManageUsers = () => {
   }, []);
 
   return (
-    <div>
-      <div>logged in user:{JSON.stringify(user)}</div>
-      <hr />
-      <ul>
-        {users.map((user) => (
-          <li key={user.userid}>{JSON.stringify(user)}</li>
-        ))}
-      </ul>
-    </div>
+    <>
+      <div>
+        <table>
+          <thead>
+            <tr>
+              <th>Logged in user</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <UserProfile user={user!} />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <hr />
+        <table>
+          <thead>
+            <tr>
+              <th>User ID</th>
+              <th>User Data</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.map((user) => (
+              <tr key={user.userid}>
+                <td>{user.userid}</td>
+                <td>
+                  <UserComponent user={user} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 };
 
