@@ -4,7 +4,7 @@ const getUserEndpoint = (username: string, password: string) =>
   `http://localhost:3000/api/v1/users/finduser?username=${username}&password=${password}`;
 
 export interface DBUser {
-  userid: number;
+  userid?: number;
   company: string;
   policy: string;
   rights: string;
@@ -14,7 +14,7 @@ export interface DBUser {
   username: string;
   email: string;
   password: string;
-  date: string | null;
+  date?: string | null;
 }
 
 export const getUserbyEmailPass = async (

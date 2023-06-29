@@ -46,7 +46,7 @@ const ManageUsers = () => {
           <tbody>
             <tr>
               <td>
-                <UserProfile user={user!} />
+                <UserProfile dbuser={user!} />
               </td>
             </tr>
           </tbody>
